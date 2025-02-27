@@ -10,10 +10,11 @@ import {User} from "./model/user.model";
 export class AuthService {
 
     constructor(private http:HttpClient) {
-
+        console.log('AuthService Constructor...')
     }
 
     login(email:string, password:string): Observable<User> {
+        console.log('AuthService:login(..) ...')
         return this.http.post<User>('/api/login', {email,password});
     }
 

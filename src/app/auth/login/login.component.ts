@@ -7,6 +7,8 @@ import {AuthService} from "../auth.service";
 import {tap} from "rxjs/operators";
 import {noop} from "rxjs";
 import {Router} from "@angular/router";
+import { AuthState } from '../reducers';
+import { login } from '../auth.actions';
 
 @Component({
     selector: 'login',
@@ -21,8 +23,11 @@ export class LoginComponent implements OnInit {
   constructor(
       private fb:FormBuilder,
       private auth: AuthService,
-      private router:Router) {
+      private router:Router,
+      private store: Store<AuthState>
+    ) {
 
+        console.log('LoginComponent Constructor...')
       this.form = fb.group({
           email: ['test@angular-university.io', [Validators.required]],
           password: ['test', [Validators.required]]
@@ -31,11 +36,28 @@ export class LoginComponent implements OnInit {
   }
 
   ngOnInit() {
-
+    console.log('LoginComponent ngOnInit()...')
   }
 
   login() {
+    console.log('LoginComponent:login() ...');
+    const val = this.form.value;
+    this.auth.login(val.email, val.password).pipe(
+        tap(user => {
+            
+            console.log(`logged in ${user}`);
 
+            const newLoginAction = login({user:user});
+            console.log("New login action", newLoginAction);
+
+            this.store.dispatch(newLoginAction);
+            this.router.navigateByUrl('/courses');
+        } )
+    )
+    .subscribe(
+        noop, 
+        () => alert('Login Failed.')
+    )
   }
 
 }

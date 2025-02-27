@@ -23,11 +23,12 @@ import {EntityDataModule} from '@ngrx/data';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { reduce } from 'rxjs/operators';
 import { entityConfig } from './entity-metadata';
+import { metaReducers, reducers } from './auth/reducers';
 
 
 const routes: Routes = [
   {
-    path: 'courses',
+    path: 'courses', // lazy loading
     loadChildren: () => import('./courses/courses.module').then(m => m.CoursesModule)
   },
   {
@@ -41,20 +42,28 @@ const routes: Routes = [
 @NgModule({ declarations: [
         AppComponent
     ],
-    bootstrap: [AppComponent], imports: [BrowserModule,
-        BrowserAnimationsModule,
-        RouterModule.forRoot(routes),
-        MatMenuModule,
-        MatIconModule,
-        MatSidenavModule,
-        MatProgressSpinnerModule,
-        MatListModule,
-        MatToolbarModule,
-        AuthModule.forRoot(),
-        StoreModule.forRoot({}, {}),
-        EntityDataModule.forRoot(entityConfig),
-        EffectsModule.forRoot([]),
-        StoreRouterConnectingModule.forRoot(),
-        StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })], providers: [provideHttpClient(withInterceptorsFromDi())] })
+    bootstrap: [AppComponent
+
+    ], imports: [
+      BrowserModule,
+      BrowserAnimationsModule,
+      RouterModule.forRoot(routes),
+      MatMenuModule,
+      MatIconModule,
+      MatSidenavModule,
+      MatProgressSpinnerModule,
+      MatListModule,
+      MatToolbarModule,
+      AuthModule.forRoot(), // eager loading
+      StoreModule.forRoot(reducers, { metaReducers }),
+      EntityDataModule.forRoot(entityConfig),
+      EffectsModule.forRoot([]),
+      StoreRouterConnectingModule.forRoot(),
+      StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: !isDevMode() })
+      ], 
+      providers: [
+        provideHttpClient(withInterceptorsFromDi())
+      ] 
+    })
 export class AppModule {
 }
